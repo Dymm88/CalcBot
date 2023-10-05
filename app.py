@@ -1,16 +1,20 @@
 import telebot
+import requests
 from telebot import types
 from settings import *
 
 bot = telebot.TeleBot(TOKEN)
+data = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
 
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
     btn1 = types.KeyboardButton("🐓")
     btn2 = types.KeyboardButton("🤡")
+    btn3 = types.KeyboardButton("🤑")
     markup.row(btn1, btn2)
+    markup.row(btn3)
     bot.send_message(
         message.chat.id,
         f"здорово, кладОвщик {message.from_user.first_name},"
@@ -32,6 +36,13 @@ def calc(message):
     elif message.text == "🤡":
         ans = bot.send_message(message.chat.id, "Какой день?")
         bot.register_next_step_handler(ans, comrade)
+    elif message.text == "🤑":
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+        btn_usd = types.KeyboardButton("💸")
+        btn_eur = types.KeyboardButton("💶")
+        markup.row(btn_usd, btn_eur)
+        money = bot.send_message(message.chat.id, "Выбери валюту", reply_markup=markup)
+        bot.register_next_step_handler(money, convert)
 
 
 def next_func(message):
@@ -108,6 +119,20 @@ def comrade(message):
         bot.send_sticker(
             message.chat.id,
             "CAACAgIAAxkBAAEBUNRlHmOX6atHGhb4QbTbPlGDccS5TgACgwADRA3PF-t8ZIYBnSqzMAQ"
+        )
+
+
+def convert(message):
+    mon = message.text
+    if mon == "💸":
+        bot.send_message(
+            message.chat.id,
+            f"{data['Valute']['USD']['Name']} {data['Valute']['USD']['Value']}"
+        )
+    if mon == "💶":
+        bot.send_message(
+            message.chat.id,
+            f"{data['Valute']['EUR']['Name']} {data['Valute']['EUR']['Value']}"
         )
 
 
