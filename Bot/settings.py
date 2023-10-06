@@ -7,13 +7,6 @@ load_dotenv(find_dotenv())
 TOKEN = os.environ.get('TOKEN')
 
 
-a = None
-b = None
-c = None
-d = None
-e = None
-f = None
-
 x = {
     "1": "",
     "2": "",

@@ -1,10 +1,17 @@
 import telebot
 import requests
 from telebot import types
-from settings import *
+from settings import TOKEN, x
 
 bot = telebot.TeleBot(TOKEN)
 data = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
+
+a = None
+b = None
+c = None
+d = None
+e = None
+f = None
 
 
 @bot.message_handler(commands=['start', 'help'])
