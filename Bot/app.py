@@ -6,12 +6,7 @@ from settings import TOKEN, x
 bot = telebot.TeleBot(TOKEN)
 data = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
 
-a = None
-b = None
-c = None
-d = None
-e = None
-f = None
+user_dict = {}
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -53,51 +48,85 @@ def calc(message):
 
 
 def next_func(message):
-    global a
-    a = message.text
-    calc2 = bot.send_message(message.chat.id, "Приемка")
-    bot.register_next_step_handler(calc2, next_func2)
+    user = message.from_user.id
+    first_key = (user, {})
+    user_dict.update([first_key])
+    if user in user_dict.keys():
+        a = ('a', message.text)
+        user_dict[user].update([a])
+        calc2 = bot.send_message(message.chat.id, "Приемка")
+        bot.register_next_step_handler(calc2, next_func2)
+    else:
+        calc = bot.send_message(message.chat.id, "Сборка")
+        bot.register_next_step_handler(calc, next_func)
 
 
 def next_func2(message):
-    global b
-    b = message.text
-    calc3 = bot.send_message(message.chat.id, "Разнос")
-    bot.register_next_step_handler(calc3, next_func3)
+    user = message.from_user.id
+    if user in user_dict.keys():
+        b = ('b', message.text)
+        user_dict[user].update([b])
+        calc3 = bot.send_message(message.chat.id, "Разнос")
+        bot.register_next_step_handler(calc3, next_func3)
+    else:
+        calc2 = bot.send_message(message.chat.id, "Приемка")
+        bot.register_next_step_handler(calc2, next_func2)
 
 
 def next_func3(message):
-    global c
-    c = message.text
-    calc4 = bot.send_message(message.chat.id, "Инвент")
-    bot.register_next_step_handler(calc4, next_func4)
+    user = message.from_user.id
+    if user in user_dict.keys():
+        c = ('c', message.text)
+        user_dict[user].update([c])
+        calc3 = bot.send_message(message.chat.id, "Инвент")
+        bot.register_next_step_handler(calc3, next_func4)
+    else:
+        calc3 = bot.send_message(message.chat.id, "Разнос")
+        bot.register_next_step_handler(calc3, next_func3)
 
 
 def next_func4(message):
-    global d
-    d = message.text
-    calc5 = bot.send_message(message.chat.id, "выдача Н")
-    bot.register_next_step_handler(calc5, next_func5)
+    user = message.from_user.id
+    if user in user_dict.keys():
+        d = ('d', message.text)
+        user_dict[user].update([d])
+        calc3 = bot.send_message(message.chat.id, "Выдача Н")
+        bot.register_next_step_handler(calc3, next_func5)
+    else:
+        calc3 = bot.send_message(message.chat.id, "Инвент")
+        bot.register_next_step_handler(calc3, next_func4)
 
 
 def next_func5(message):
-    global e
-    e = message.text
-    calc6 = bot.send_message(message.chat.id, "выдача Б/У")
-    bot.register_next_step_handler(calc6, res)
+    user = message.from_user.id
+    if user in user_dict.keys():
+        e = ('e', message.text)
+        user_dict[user].update([e])
+        calc3 = bot.send_message(message.chat.id, "Выдача Б/У")
+        bot.register_next_step_handler(calc3, next_func6)
+    else:
+        calc3 = bot.send_message(message.chat.id, "Выдача Н")
+        bot.register_next_step_handler(calc3, next_func5)
 
 
-def res(message):
+def next_func6(message):
+    user = message.from_user.id
     try:
-        global f
-        f = message.text
-        res = ((int(b) + int(f)) * 0.8 +
-               (int(a) + int(c) + int(d) + int(e)) * 0.5)
-        bot.send_message(message.chat.id, f"У тебя {res} баллов")
+        if user in user_dict.keys():
+            f = ('f', message.text)
+            user_dict[user].update([f])
+        else:
+            calc3 = bot.send_message(message.chat.id, "Выдача Б/У")
+            bot.register_next_step_handler(calc3, next_func6)
+
+        sq = user_dict[user]
+        res = (int(sq['b']) + int(sq['f']))*0.8 + (int(sq['a']) + int(sq['c']) + int(sq['d']) + int(sq['e'])) * 0.5
+        bot.send_message(message.chat.id, f"{message.from_user.first_name}, у тебя {res} баллов")
         bot.send_sticker(
             message.chat.id,
             "CAACAgIAAxkBAAEBUNZlHmOwYndrYRwlDajrQTpSFquFFgAChgADRA3PF5hySbZkSauxMAQ"
         )
+        del user_dict[user]
     except ValueError:
         bot.send_message(
             message.chat.id,
@@ -108,17 +137,18 @@ def res(message):
             message.chat.id,
             "CAACAgIAAxkBAAEBUNRlHmOX6atHGhb4QbTbPlGDccS5TgACgwADRA3PF-t8ZIYBnSqzMAQ"
                          )
+        del user_dict[user]
 
 
 def comrade(message):
     try:
         g = message.text
-        bot.send_message(message.chat.id, f"Счетоводы на {g} число:\n {x.get(g)}")
+        bot.send_message(message.chat.id, f"Счетоводы на {g} число:\n {x[g]}")
         bot.send_sticker(
             message.chat.id,
             "CAACAgIAAxkBAAEBUjplHqXI5AnG0_-BdsNJQZVOfYDRaAACaQADRA3PF06e1cjIjCI1MAQ"
         )
-    except ValueError:
+    except KeyError:
         bot.send_message(
             message.chat.id,
             f"Ты что ввёл,совсем цифры забыл, или Ебаклак???"
@@ -141,6 +171,9 @@ def convert(message):
             message.chat.id,
             f"{data['Valute']['EUR']['Name']} {data['Valute']['EUR']['Value']}"
         )
+    bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAEBV2NlIGmf4yU2Vp1LE5d7v-iGqrCBwAACqwADwZxgDASGdYaYFD_QMAQ")
+    send_welcome(message)
 
 
-bot.infinity_polling()
+if __name__ == "__main__":
+    bot.infinity_polling()
