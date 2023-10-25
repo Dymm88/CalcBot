@@ -1,13 +1,16 @@
 import os
-
+import telebot
 from dotenv import load_dotenv, find_dotenv
 
 
 load_dotenv(find_dotenv())
 TOKEN = os.environ.get('TOKEN')
+bot = telebot.TeleBot(TOKEN)
+
+user_dict = {}
 
 
-x = {
+comrade_dict = {
     "1": "",
     "2": "",
     "3": "",

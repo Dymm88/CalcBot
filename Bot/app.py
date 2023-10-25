@@ -1,12 +1,9 @@
-import telebot
 import requests
 from telebot import types
-from settings import TOKEN, x
+from settings import bot, comrade_dict, user_dict
 
-bot = telebot.TeleBot(TOKEN)
+
 data = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
-
-user_dict = {}
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -57,6 +54,7 @@ def next_func(message):
         calc2 = bot.send_message(message.chat.id, "Приемка")
         bot.register_next_step_handler(calc2, next_func2)
     else:
+        bot.send_message(message.chat.id, f'{message.from_user.first_name}, Не суй свой нос в чужой запрос!!!')
         calc = bot.send_message(message.chat.id, "Сборка")
         bot.register_next_step_handler(calc, next_func)
 
@@ -69,6 +67,7 @@ def next_func2(message):
         calc3 = bot.send_message(message.chat.id, "Разнос")
         bot.register_next_step_handler(calc3, next_func3)
     else:
+        bot.send_message(message.chat.id, f'{message.from_user.first_name}, Не суй свой нос в чужой запрос!!!')
         calc2 = bot.send_message(message.chat.id, "Приемка")
         bot.register_next_step_handler(calc2, next_func2)
 
@@ -81,6 +80,7 @@ def next_func3(message):
         calc3 = bot.send_message(message.chat.id, "Инвент")
         bot.register_next_step_handler(calc3, next_func4)
     else:
+        bot.send_message(message.chat.id, f'{message.from_user.first_name}, Не суй свой нос в чужой запрос!!!')
         calc3 = bot.send_message(message.chat.id, "Разнос")
         bot.register_next_step_handler(calc3, next_func3)
 
@@ -93,6 +93,7 @@ def next_func4(message):
         calc3 = bot.send_message(message.chat.id, "Выдача Н")
         bot.register_next_step_handler(calc3, next_func5)
     else:
+        bot.send_message(message.chat.id, f'{message.from_user.first_name}, Не суй свой нос в чужой запрос!!!')
         calc3 = bot.send_message(message.chat.id, "Инвент")
         bot.register_next_step_handler(calc3, next_func4)
 
@@ -105,6 +106,7 @@ def next_func5(message):
         calc3 = bot.send_message(message.chat.id, "Выдача Б/У")
         bot.register_next_step_handler(calc3, next_func6)
     else:
+        bot.send_message(message.chat.id, f'{message.from_user.first_name}, Не суй свой нос в чужой запрос!!!')
         calc3 = bot.send_message(message.chat.id, "Выдача Н")
         bot.register_next_step_handler(calc3, next_func5)
 
@@ -116,6 +118,7 @@ def next_func6(message):
             f = ('f', message.text)
             user_dict[user].update([f])
         else:
+            bot.send_message(message.chat.id, f'{message.from_user.first_name}, Не суй свой нос в чужой запрос!!!')
             calc3 = bot.send_message(message.chat.id, "Выдача Б/У")
             bot.register_next_step_handler(calc3, next_func6)
 
@@ -126,7 +129,6 @@ def next_func6(message):
             message.chat.id,
             "CAACAgIAAxkBAAEBUNZlHmOwYndrYRwlDajrQTpSFquFFgAChgADRA3PF5hySbZkSauxMAQ"
         )
-        del user_dict[user]
     except ValueError:
         bot.send_message(
             message.chat.id,
@@ -137,13 +139,13 @@ def next_func6(message):
             message.chat.id,
             "CAACAgIAAxkBAAEBUNRlHmOX6atHGhb4QbTbPlGDccS5TgACgwADRA3PF-t8ZIYBnSqzMAQ"
                          )
-        del user_dict[user]
+    del user_dict[user]
 
 
 def comrade(message):
     try:
         g = message.text
-        bot.send_message(message.chat.id, f"Счетоводы на {g} число:\n {x[g]}")
+        bot.send_message(message.chat.id, f"Счетоводы на {g} число:\n {comrade_dict[g]}")
         bot.send_sticker(
             message.chat.id,
             "CAACAgIAAxkBAAEBUjplHqXI5AnG0_-BdsNJQZVOfYDRaAACaQADRA3PF06e1cjIjCI1MAQ"
