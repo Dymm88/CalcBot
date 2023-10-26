@@ -1,5 +1,6 @@
 import os
 import telebot
+import requests
 from dotenv import load_dotenv, find_dotenv
 
 
@@ -43,3 +44,5 @@ comrade_dict = {
     "30": "Даня",
     "31": "Дима",
 }
+
+data = requests.get('https://www.cbr-xml-daily.ru/daily_json.js').json()
