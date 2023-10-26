@@ -4,7 +4,7 @@ from telebot import types
 
 def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    btn = types.KeyboardButton("⚠️")
+    btn = types.KeyboardButton("🕹")
     markup.add(btn)
     bot.send_message(message.chat.id, "Нажми на кнопку", reply_markup=markup)
 

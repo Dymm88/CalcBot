@@ -1,11 +1,10 @@
 from settings import bot, user_dict, data, comrade_dict
 from telebot import types
-from handle_commands import start
 """" функции для ввода и подсчета баллов, курса валют, сотрудников """
 
 
 def choice_menu(message):
-    if message.text == "⚠️":
+    if message.text == "🕹":
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
         btn1 = types.KeyboardButton("🐓")
         btn2 = types.KeyboardButton("🤡")
@@ -142,7 +141,10 @@ def exchange(message):
             f"{data['Valute']['EUR']['Name']} {data['Valute']['EUR']['Value']}"
         )
     bot.send_sticker(message.chat.id, "CAACAgIAAxkBAAEBV2NlIGmf4yU2Vp1LE5d7v-iGqrCBwAACqwADwZxgDASGdYaYFD_QMAQ")
-    start(message)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn_back = types.KeyboardButton("🕹")
+    markup.add(btn_back)
+    bot.send_message(message.chat.id, "Что будем делать?", reply_markup=markup)
 
 
 def collab(message):
